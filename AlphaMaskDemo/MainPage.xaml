@@ -1,0 +1,75 @@
+﻿<Page x:Class="AlphaMaskDemo.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="using:AlphaMaskDemo"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+
+    <Grid x:Name="LayoutRoot">
+
+        <Image x:Name="BackgroundImage"
+               ImageOpened="ImageBrush_OnImageOpened"
+               Source="../Assets/blue-star-background-wallpaper-3.jpg"
+               Stretch="UniformToFill" />
+
+        <GridView x:Name="Posters" Margin="200,48">
+            <GridView.Resources>
+                <Style TargetType="ListViewItem" />
+                <Style TargetType="Image">
+                    <Setter Property="Stretch" Value="UniformToFill" />
+                    <Setter Property="Width" Value="300" />
+                    <Setter Property="Margin" Value="12" />
+                </Style>
+            </GridView.Resources>
+            <GridViewItem>
+                <Image Source="Assets/Posters/1.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/2.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/3.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/4.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/5.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/6.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/7.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/8.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/9.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/10.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/11.jpg" />
+            </GridViewItem>
+            <GridViewItem>
+                <Image Source="Assets/Posters/12.jpg" />
+            </GridViewItem>
+        </GridView>
+        
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left">
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Margin" Value="12"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Click="TopClick">Top</Button>
+            <Button Click="BottomClick">Bottom</Button>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ArrayOfArrayOfArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ArrayOfArrayOfString>
+    <ArrayOfString>
+      <string>AlphaMaskDemo</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\daren\documents\visual studio 15\projects\alphamaskdemo\alphamaskdemo\app.xaml.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>c:\users\daren\documents\visual studio 15\projects\alphamaskdemo\alphamaskdemo\compositionmaskhelper.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>C:\Users\Daren\Documents\Visual Studio 15\Projects\AlphaMaskDemo\AlphaMaskDemo\MainPage.xaml</string>
+      <string>c:\users\daren\documents\visual studio 15\projects\alphamaskdemo\alphamaskdemo\mainpage.xaml.cs</string>
+    </ArrayOfString>
+  </ArrayOfArrayOfString>
+</ArrayOfArrayOfArrayOfString>

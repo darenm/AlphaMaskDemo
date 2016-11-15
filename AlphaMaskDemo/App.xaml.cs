@@ -56,8 +56,8 @@ namespace AlphaMaskDemo
                 {
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Top,
-                    Width = Window.Current.Bounds.Width,
-                    Height = Window.Current.Bounds.Height
+                    //Width = Window.Current.Bounds.Width,
+                    //Height = Window.Current.Bounds.Height
                 };
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
@@ -85,18 +85,18 @@ namespace AlphaMaskDemo
             }
 
 
-            var sizeChangedObservable = Observable
-                .FromEventPattern<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs>(
-                    handler => Window.Current.SizeChanged += handler,
-                    handler => Window.Current.SizeChanged -= handler);
-            sizeChangedObservable.Throttle(TimeSpan.FromSeconds(0.35))
-                .ObserveOnDispatcher(CoreDispatcherPriority.Normal)
-                .Subscribe(x =>
-                {
-                    // here we set the new size
-                    rootFrame.Width = x.EventArgs.Size.Width;
-                    rootFrame.Height = x.EventArgs.Size.Height;
-                });
+            //var sizeChangedObservable = Observable
+            //    .FromEventPattern<WindowSizeChangedEventHandler, WindowSizeChangedEventArgs>(
+            //        handler => Window.Current.SizeChanged += handler,
+            //        handler => Window.Current.SizeChanged -= handler);
+            //sizeChangedObservable.Throttle(TimeSpan.FromSeconds(0.35))
+            //    .ObserveOnDispatcher(CoreDispatcherPriority.Normal)
+            //    .Subscribe(x =>
+            //    {
+            //        // here we set the new size
+            //        rootFrame.Width = x.EventArgs.Size.Width;
+            //        rootFrame.Height = x.EventArgs.Size.Height;
+            //    });
         }
 
         /// <summary>

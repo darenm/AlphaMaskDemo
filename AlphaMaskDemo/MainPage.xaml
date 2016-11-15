@@ -7,13 +7,42 @@
       mc:Ignorable="d">
 
     <Grid x:Name="LayoutRoot">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="TranslateGroup">
+                <VisualStateGroup.Transitions>
+                    <VisualTransition GeneratedDuration="0:0:1">
+                        <VisualTransition.GeneratedEasingFunction>
+                            <ExponentialEase EasingMode="EaseInOut"/>
+                        </VisualTransition.GeneratedEasingFunction>
+                    </VisualTransition>
+                </VisualStateGroup.Transitions>
+                <VisualState x:Name="Initial"/>
+                <VisualState x:Name="Moved">
+                    <VisualState.Setters>
+                        <Setter Target="Posters.(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Value="500"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <Image x:Name="BackgroundImage"
                ImageOpened="ImageBrush_OnImageOpened"
                Source="../Assets/blue-star-background-wallpaper-3.jpg"
                Stretch="UniformToFill" />
 
-        <GridView x:Name="Posters" Margin="200,48">
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left">
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Margin" Value="12"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Click="TopClick">Top</Button>
+            <Button Click="BottomClick">Bottom</Button>
+            <Button Click="TranslateClick">Translate</Button>
+        </StackPanel>
+        <GridView x:Name="Posters" Margin="200,48" RenderTransformOrigin="0.5,0.5">
             <GridView.Resources>
                 <Style TargetType="ListViewItem" />
                 <Style TargetType="Image">
@@ -22,6 +51,9 @@
                     <Setter Property="Margin" Value="12" />
                 </Style>
             </GridView.Resources>
+            <GridView.RenderTransform>
+                <CompositeTransform/>
+            </GridView.RenderTransform>
             <GridViewItem>
                 <Image Source="Assets/Posters/1.jpg" />
             </GridViewItem>
@@ -59,17 +91,5 @@
                 <Image Source="Assets/Posters/12.jpg" />
             </GridViewItem>
         </GridView>
-        
-        <StackPanel Orientation="Horizontal"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Left">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Margin" Value="12"/>
-                </Style>
-            </StackPanel.Resources>
-            <Button Click="TopClick">Top</Button>
-            <Button Click="BottomClick">Bottom</Button>
-        </StackPanel>
     </Grid>
 </Page>

@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Media.Imaging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Composition;
 using Robmikh.CompositionSurfaceFactory;
+using Windows.UI.Xaml;
+using Windows.UI;
 
 namespace AlphaMaskDemo
 {
@@ -24,6 +26,11 @@ namespace AlphaMaskDemo
         private readonly CompositionGraphicsDevice _compositionDevice;
         private readonly Compositor _compositor;
         private readonly SurfaceFactory _surfaceFactory;
+        private CompositionSurfaceBrush _backgroundImageBrush;
+        private CompositionDrawingSurface _backgroundSurface;
+        private Image _image;
+
+        public bool ImageLoaded { get; private set; }
 
         public CompositionMaskHelper(Compositor compositor)
         {
@@ -31,6 +38,16 @@ namespace AlphaMaskDemo
             _canvasDevice = new CanvasDevice();
             _compositionDevice = CanvasComposition.CreateCompositionGraphicsDevice(_compositor, _canvasDevice);
             _surfaceFactory = SurfaceFactory.CreateFromCompositor(_compositor);
+        }
+
+        public async Task LoadBackgroundImage(Image image)
+        {
+            _image = image;
+            var bitmapSource = image.Source as BitmapImage;
+            _backgroundSurface = await _surfaceFactory.CreateSurfaceFromUriAsync(bitmapSource.UriSource);
+            _backgroundImageBrush = _compositor.CreateSurfaceBrush(_backgroundSurface);
+            _backgroundImageBrush.Stretch = CompositionStretch.UniformToFill;
+            ImageLoaded = true;
         }
 
         /// <summary>
@@ -52,14 +69,10 @@ namespace AlphaMaskDemo
         public async Task ApplyOverlayAsync(Panel parentContainer, ItemsControl overlayTarget,
             Image backgroundImage, Uri opacityMaskImageUri, Rect overlay)
         {
-            var bitmap = await CreateBackgroundBitmap(backgroundImage);
-            var pixels = await bitmap.GetPixelsAsync();
-            var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
             var areaToRender = DetermineAreaToRender(parentContainer, overlayTarget, overlay);
-            var backgroundImageBrush = CreateBackgroundBrush(pixels, bitmap, dpi, areaToRender);
 
             var opacityBrush = await CreateOpacityMaskBrush(opacityMaskImageUri);
-            var maskbrush = CreateMaskBrush(opacityBrush, backgroundImageBrush);
+            var maskbrush = CreateMaskBrush(opacityBrush, _backgroundImageBrush);
             var maskSprite = CreateMaskSprite(overlay, maskbrush);
 
             ElementCompositionPreview.SetElementChildVisual(overlayTarget, maskSprite);
@@ -76,25 +89,49 @@ namespace AlphaMaskDemo
 
             var spriteVisuals = new List<SpriteVisual>();
 
-            var bitmap = await CreateBackgroundBitmap(backgroundImage);
-            var pixels = await bitmap.GetPixelsAsync();
-            var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
-
             // as we want to add multiple overlay visuals, we need to add them to 
             // a container visual first.
             // we then add the container visual to the target element.
             var targetContainerVisual = _compositor.CreateContainerVisual();
-            ;
 
             foreach (var overlay in overlayArray)
             {
+                // this determines the region of the background image brush I need to render over the GridView
+                // to create the illusion of transparency
                 var areaToRender = DetermineAreaToRender(parentContainer, overlayTarget, overlay.OverlayTargetRect);
-                var backgroundImageBrush = CreateBackgroundBrush(pixels, bitmap, dpi, areaToRender);
 
-                var opacityBrush = await CreateOpacityMaskBrush(overlay.OverlayMaskImageUri);
-                var maskbrush = CreateMaskBrush(opacityBrush, backgroundImageBrush);
-                var maskSprite = CreateMaskSprite(overlay.OverlayTargetRect, maskbrush);
-                maskSprite.Opacity = overlay.InitialRenderTransparent ? 0.0f : 1.0f;
+                // loads the correct image mask
+                if (overlay.OverlayMaskSurfaceBrush == null)
+                {
+                    overlay.OverlayMaskSurfaceBrush = await CreateOpacityMaskBrush(overlay.OverlayMaskImageUri);
+                }
+
+                // starts to create the sprite visual for the overlay
+                var maskSprite = _compositor.CreateSpriteVisual();
+                // ensures the sprite matches the size of the image element, so that the 
+                // background image brush is sized the same
+                maskSprite.Size = new Vector2((float) _image.ActualWidth, (float)_image.ActualHeight);
+                // here's where I run into a problem
+                // Effects can only be performed on brushes...
+                // but the only way I can see how to get the fragment I want to display
+                // is to load the bacground image brush, then clip the SpriteVisual
+                // then move the SpriteVisual.Offset to align correctly on the GridView.
+                maskSprite.Brush = _backgroundImageBrush;
+                var leftInset = (float)areaToRender.Left;
+                var topInset = (float)areaToRender.Top;
+                var rightInset = (float)_image.ActualWidth - (float)areaToRender.Width;
+                var bottomInset = (float)_image.ActualHeight - (float)areaToRender.Height;
+                maskSprite.Clip = _compositor.CreateInsetClip(
+                    leftInset,
+                    topInset,
+                    rightInset - leftInset,
+                    bottomInset - topInset);
+                maskSprite.Offset = new Vector3(
+                    (float)overlay.OverlayTargetRect.Left - leftInset, 
+                    (float)overlay.OverlayTargetRect.Top - topInset, 0);
+
+                // initially setting opacity to less than 1 so it is apparent
+                maskSprite.Opacity = overlay.InitialRenderTransparent ? 0 : 0.9f;
                 targetContainerVisual.Children.InsertAtTop(maskSprite);
                 spriteVisuals.Add(maskSprite);
             }
@@ -212,5 +249,6 @@ namespace AlphaMaskDemo
         public Uri OverlayMaskImageUri { get; set; }
         public Rect OverlayTargetRect { get; set; }
         public bool InitialRenderTransparent { get; set; }
+        public CompositionSurfaceBrush OverlayMaskSurfaceBrush { get; set; }
     }
 }

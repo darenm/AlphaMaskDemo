@@ -26,6 +26,7 @@ namespace AlphaMaskDemo
             // setup composition
             _compositionMaskHelper = new CompositionMaskHelper(ElementCompositionPreview.GetElementVisual(this).Compositor);
             Posters.SizeChanged += OnSizeChanged;
+            VisualStateManager.GoToState(this, Initial.Name, false);
         }
 
         private async void OnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
@@ -34,12 +35,20 @@ namespace AlphaMaskDemo
             {
                 return;
             }
+            if (!_compositionMaskHelper.ImageLoaded)
+            {
+                await _compositionMaskHelper.LoadBackgroundImage(BackgroundImage);
+            }
             await RenderOverlay();
         }
 
         private async void ImageBrush_OnImageOpened(object sender, RoutedEventArgs e)
         {
             _imageLoaded = true;
+            if (!_compositionMaskHelper.ImageLoaded)
+            {
+                await _compositionMaskHelper.LoadBackgroundImage(BackgroundImage);
+            }
             await RenderOverlay();
         }
 
@@ -77,6 +86,11 @@ namespace AlphaMaskDemo
             {
                 _masks[1].Opacity = _masks[1].Opacity == 0f ? 1.0f : 0f;
             }
+        }
+
+        private void TranslateClick(object sender, RoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, TranslateGroup.CurrentState == Initial ? Moved.Name : Initial.Name, true);
         }
     }
 }
